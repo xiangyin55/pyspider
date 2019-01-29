@@ -1,4 +1,8 @@
+# -*- coding:utf-8 -*-
 #!flask/bin/python
+# pip install flask
+# pip install flask-httpauth
+
 from flask import Flask, jsonify
 from flask import abort
 from flask import make_response
