@@ -2,6 +2,17 @@
 #!flask/bin/python
 # pip install flask
 # pip install flask-httpauth
+'''
+==========  ===============================================  =============================
+HTTP 方法   URL                                              动作
+==========  ===============================================  ==============================
+GET         http://[hostname]/todo/api/v1.0/tasks            检索任务列表
+GET         http://[hostname]/todo/api/v1.0/tasks/[task_id]  检索某个任务
+POST        http://[hostname]/todo/api/v1.0/tasks            创建新任务
+PUT         http://[hostname]/todo/api/v1.0/tasks/[task_id]  更新任务
+DELETE      http://[hostname]/todo/api/v1.0/tasks/[task_id]  删除任务
+==========  ================================================ =============================
+'''
 
 from flask import Flask, jsonify
 from flask import abort
