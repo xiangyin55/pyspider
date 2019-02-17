@@ -77,9 +77,7 @@ def save_ips():
 
     try:
         # 如果config.SAVE_PATH路径不存在，自动创建
-        f = open(path, "w")
-        f.write(json.dumps(proxies)) # 以json格式保存数据，方便解析
-        f.close()
+        open(path, "w").write(json.dumps(proxies)) # 以json格式保存数据，方便解析
         print(path,'save succeed')
     except Exception as e:
         raise e
