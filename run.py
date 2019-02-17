@@ -77,16 +77,16 @@ def get_ips(total=1,type='https'):
         print(path,"文件不存在")
         return
 
-    j = json.load(open(path,'r').read())
+    j = json.load(open(path,'r'))
 
 
     http_list = []
     https_list = []
     for d in j:
         if d['type'] == 'http':
-            http_list.append(d['host'] + ':' + d['port'])
+            http_list.append(d['host'] + ':' + str(d['port']))
         elif d['type'] == 'https':
-            http_list.append(d['host'] + ':' + d['port'])
+            https_list.append(d['host'] + ':' + str(d['port']))
 
     proxies = []
     for i in range(total):
