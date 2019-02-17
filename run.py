@@ -67,6 +67,11 @@ def save_ips():
 
 def get_ips(total=1,type='https'):
     """读取已经保存的IP，随机抽出total数量的IP"""
+    """type='http'  返回http代理 socket """
+    """type='https'  返回https代理 socket """
+    """type='proxies'  返回proxies参数代理格式 """
+
+
     path = u'ips_all.txt'
     if os.path.exists(path) == False:
         print(path,"文件不存在")
@@ -74,13 +79,28 @@ def get_ips(total=1,type='https'):
 
     j = json.load(open(path,'r').read())
 
-    proxies = []
 
+    http_list = []
+    https_list = []
     for d in j:
-        if d['type'] == type :
-            proxies.append(d['host'] + ':' + str(d['port']))
+        if d['type'] == 'http':
+            http_list.append(d['host'] + ':' + d['port'])
+        elif d['type'] == 'https':
+            http_list.append(d['host'] + ':' + d['port'])
 
-    return random.sample(proxies,total)
+    proxies = []
+    for i in range(total):
+        http = random.choice(http_list)
+        https = random.choice(https_list)
+        proxy = {'http':'http://'+http,'https':'https://'+https}  # 返回的每一个代理
+        proxies.append(proxy)
+
+    if type == 'http':
+        return random.sample(http_list,total)
+    elif type == 'https':
+        return random.sample(https_list,total)
+    elif type == 'proxies':
+        return proxies
 
 def verify_ips(proxies):
     useful_proxies = []
