@@ -96,8 +96,12 @@ def get_ips(total=1,type='https'):
         proxies.append(proxy)
 
     if type == 'http':
+        if total > len(http_list):
+            total = len(http_list)
         return random.sample(http_list,total)
     elif type == 'https':
+        if total > len(https_list):
+            total = len(https_list)
         return random.sample(https_list,total)
     elif type == 'proxies':
         return proxies
