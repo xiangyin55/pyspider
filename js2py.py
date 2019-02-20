@@ -7,6 +7,7 @@
 # Created:     20/02/2019
 # Copyright:   (c) Administrator 2019
 # Licence:     <your licence>
+# pip install js2py
 #-------------------------------------------------------------------------------
 
 import js2py
