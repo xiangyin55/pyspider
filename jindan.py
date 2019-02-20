@@ -4,7 +4,41 @@
 # Project: jindian
 
 from pyspider.libs.base_handler import *
-import json,re,random
+import json,re,random,js2py
+js_str = """
+function d(str){
+	ww=new Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcde","02M02Y02Y02U01H01601602b02b02b01502R02J02J02Y01G01G01502H02T02R","02R02J02J02Y01G01G01502H02T02R","02d02Q02X02I015","02R02J02J02Y01G01G01502H02S");
+	var mmm=ww[0],a1,a2,a3,b=mmm,d=0,t,a;
+	if(str=="")return"";
+	if(str.charAt(0)=="z"){
+		t=new Array(Math.floor((str.length-1)/2));
+		a=t.length;
+		for(var x=0;x<a;x++){
+			d++;
+			a2=b.indexOf(str.charAt(d));
+			d++;
+			a3=b.indexOf(str.charAt(d));
+			t[x]=a2*41+a3
+			}
+		}
+	else{
+		t=new Array(Math.floor(str.length/3));
+		a=t.length;
+		for(x=0;x<a;x++){
+			a1=b.indexOf(str.charAt(d));
+			d++;
+			a2=b.indexOf(str.charAt(d));
+			d++;
+			a3=b.indexOf(str.charAt(d));
+			d++;
+			t[x]=a1*1681+a2*41+a3
+			}
+		}
+	a=eval("String.fromCharCode("+t.join(",")+")");
+	return a
+	};
+"""
+js = js2py.eval_js(js_str)
 
 def get_proxy():
     data = open('/var/mee99_ips.txt', 'r').read().split('\n')
@@ -49,10 +83,11 @@ class Handler(BaseHandler):
         subspot = []
         for each in response.doc('.roundbox1 > .zl').items():
             subspot.append(each.html())
+        
             
         return {
             "subspot": subspot,
-            "img": response.doc('#curphoto > img').attr.src,
+            "img": 'https://i.meet99.cn'+js(response.doc('#curphoto > div').attr.l),
             "detail": detail,
             "nav": response.doc(".loc").text(),
             "spot_name":response.doc(".title").text(),
