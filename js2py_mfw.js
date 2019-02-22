@@ -1,6 +1,4 @@
-
 <script type="text/javascript">
-
 var _0xb483 = ["\x5F\x64\x65\x63\x6F\x64\x65", "\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];
 (function(_0xd642x1) {
     _0xd642x1[_0xb483[0]] = _0xb483[1]
@@ -368,6 +366,19 @@ var __Ox2133f = ["\x75\x73\x65\x20\x73\x74\x72\x69\x63\x74", "\x24", "\x53\x70\x
         var _0xe7fex39 = _0xe7fex37(_0xe7fex36);
         return _0xe7fex2[__Ox2133f[40]](JSON[__Ox2133f[60]](_0xe7fex39) + _0xe7fex34)[__Ox2133f[48]](2, 12)
     }
-param = {"iMddid":"66251","iPage":"7","iTagId":"0","sAct":"KMdd_StructWebAjax|GetPoisByTag","_ts":"1550815671485"}
-var a = _0xe7fex35(param)
+    function _0xe7fex44(_0xe7fex42) {
+
+        if (_0xe7fex42[__Ox2133f[63]]) {
+            delete _0xe7fex42[__Ox2133f[63]]
+        };
+        _0xe7fex42[__Ox2133f[64]] = new Date()[__Ox2133f[65]]().toString();
+        var _0xe7fex43 = _0xe7fex35(_0xe7fex42);
+        _0xe7fex42[__Ox2133f[63]] = _0xe7fex43;
+        return _0xe7fex42
+    }
+
+param = {"iMddid":"10136","iPage":"7","iTagId":"0","sAct":"KMdd_StructWebAjax|GetPoisByTag","_ts":"1550817649453"};
+var a = _0xe7fex44(param);
+document.getElementById("demo").innerHTML = "";
+    
 </script>
