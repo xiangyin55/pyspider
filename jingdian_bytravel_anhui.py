@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # Created on 2019-02-19 22:26:17
-# Project:  jingdian_bytravel_anhui_v1
+# Project: jingdian_bytravel_anhui_v1
 
 from pyspider.libs.base_handler import *
-import json,re,random
+import json,re,random,datetime,pymongo
 
 def get_proxy():
     data = open('/var/mee99_ips.txt', 'r').read().split('\n')
@@ -45,7 +45,12 @@ class Handler(BaseHandler):
 
         area_s = response.doc("#mainbao a").text()
         area_full = area_s.replace(" ",".").replace(u"首页",u"中国").replace(u"旅游",u"") if area_s else ""
+        
+        sid = response.url.replace(u'http://wap.bytravel.cn/Landscape/','').replace('/','-').replace('.html','')
+
+            
         return {
+            "id": sid,
             "url": response.url,
             "name": response.doc('h1').text(),
             "summary":  response.doc('article').text()[0:response.doc('article').text().find(u"下一景区：")],
@@ -54,3 +59,16 @@ class Handler(BaseHandler):
             "image": response.doc('article > div > a > img').attr.src,
             "qualification":  response.doc('.f14b').text()    
         }
+    
+    def on_result(self, result):
+        super(Handler, self).on_result(result)
+        if not result: return
+        result["update"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        client = pymongo.MongoClient('127.0.0.1')
+        db = client["scenics_anhui"]
+        travel = db["bytravel"]
+        try:
+            travel.update({'id': result.get('id')}, {'$set': result},True,False)
+        except Exception as e:
+            print (e)
+            print ("Error")
