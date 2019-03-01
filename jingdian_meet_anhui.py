@@ -1,44 +1,12 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-# Created on 2019-02-19 22:26:17
-# Project: jingdian_meet_anhui_v4
+# Created on 2019-02-28 11:04:12
+# Project: meet_anhui_v1
 
 from pyspider.libs.base_handler import *
 import json,re,random,js2py,datetime,pymongo
-js_str = """
-function d(str){
-	ww=new Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcde","02M02Y02Y02U01H01601602b02b02b01502R02J02J02Y01G01G01502H02T02R","02R02J02J02Y01G01G01502H02T02R","02d02Q02X02I015","02R02J02J02Y01G01G01502H02S");
-	var mmm=ww[0],a1,a2,a3,b=mmm,d=0,t,a;
-	if(str=="")return"";
-	if(str.charAt(0)=="z"){
-		t=new Array(Math.floor((str.length-1)/2));
-		a=t.length;
-		for(var x=0;x<a;x++){
-			d++;
-			a2=b.indexOf(str.charAt(d));
-			d++;
-			a3=b.indexOf(str.charAt(d));
-			t[x]=a2*41+a3
-			}
-		}
-	else{
-		t=new Array(Math.floor(str.length/3));
-		a=t.length;
-		for(x=0;x<a;x++){
-			a1=b.indexOf(str.charAt(d));
-			d++;
-			a2=b.indexOf(str.charAt(d));
-			d++;
-			a3=b.indexOf(str.charAt(d));
-			d++;
-			t[x]=a1*1681+a2*41+a3
-			}
-		}
-	a=eval("String.fromCharCode("+t.join(",")+")");
-	return a
-	};
-"""
-js = js2py.eval_js(js_str)
+
+js = js2py.eval_js(open("/var/meet99.js",'r').read())
 
 def get_proxy():
     data = open('/var/mee99_ips.txt', 'r').read().split('\n')
@@ -46,12 +14,13 @@ def get_proxy():
 
 class Handler(BaseHandler):
     crawl_config = {
-        'process_time_limit' : 60
+        'process_time_limit' : 60,
+        "itag" : "1.0.1"
     }
 
     @every(minutes=24 * 60)
     def on_start(self):
-        self.crawl('https://www.meet99.com/maps/loadchild/lvyou/anhui', callback=self.index_page,proxy=get_proxy())
+        self.crawl('https://www.meet99.com/maps/loadchild/lvyou/hefei', callback=self.index_page,proxy=get_proxy())
 
     @config(age=10 * 24 * 60 * 60)
     def index_page(self, response):
@@ -62,20 +31,26 @@ class Handler(BaseHandler):
                 self.crawl('https://www.meet99.com/maps/loadchild/lvyou/'+each["id"], callback=self.index_page,proxy=get_proxy())
             else:
                 url = 'https://www.meet99.com/'+each['text'].split('"')[1]
+
                 self.crawl(url, callback=self.list_page,proxy=get_proxy()  )
                
 
     @config(priority=2)
     def list_page(self, response):
-        for each in response.doc('a[href^="http"]').items():
-            if re.match("https://www.meet99.com/jingdian-\w+", each.attr.href, re.U):
-                self.crawl(each.attr.href, callback=self.detail_page,proxy=get_proxy() )
+        for each in response.doc('[t=""]').items():
+            url = each('a[href^="http"]').attr.href
+            gone = each('.ever span').text()
+            want = each('.never span').text()
+            self.crawl(url, callback=self.detail_page,save={"gone":gone,"want":want},proxy=get_proxy())
     
     @config(priority=2)
     def detail_page(self, response):
         ll = response.doc('.bd > div').text()
         match = re.findall(r"(.*>.*)",ll,re.U)
         area_full = match[0].replace(">",".") if match[0] else "" 
+        area_list = area_full.split(".")
+        area_full = '.'.join(area_list[0:4]) if len(area_list)>4 else area_full
+        
         for each in response.doc('.roundbox1 > .zl > a').items():
             #scenic_spot
             self.crawl(each.attr.href, callback=self.detail_page_sub,proxy=get_proxy())
@@ -98,25 +73,27 @@ class Handler(BaseHandler):
         feature = feature.split(u"从您位置到")[0]
         
         qualification = [ s for s in detail if u"景区资质：" in s ]
-        qualification = qualification[0].replace(u'景区资质：\u3000\u3000','') if  feature else ""
+        qualification = qualification[0].replace(u'景区资质：\u3000\u3000','') if  qualification else ""
         
             
         subspot = []
         for each in response.doc('.roundbox1 > .zl').items():
             subspot.append(each.html())
-  
-        open("/var/meet99/{}_detail.txt".format(id),'w').write(response.doc(".bd > div").html().encode('utf8'))
     
         navimage = None
         if response.doc('.bd  div.img[l]'):
             navimage = 'https://i.meet99.cn'+js(response.doc('.bd  div.img[l]').attr.l)
 
+        if  response.doc(".bd > div").html() :
+            open("/root/anhui_meet/{}_detail.txt".format(sid),'w').write(response.doc(".bd > div").html().encode('utf8'))
 
         
         return {
             "id" : response.url.split("/")[-1].split(".")[0],
+            "gone" : int(response.save["gone"]),
+            "want" : int(response.save["want"]),
             "url": response.url,
-            "area_all": area_full,
+            "area_full": area_full,
             "summary" : summary,
             "feature" : feature,
             "qualification": qualification,
@@ -139,15 +116,17 @@ class Handler(BaseHandler):
         ll = response.doc('.bd > div').text()
         match = re.findall(r"(.*>.*)",ll,re.U)
         area_full = match[0].replace(">",".") if match[0] else "" 
-        title = response.doc('.title').text()
-        
+        area_list = area_full.split(".")
 
+        area_full = '.'.join(area_list[0:4]) if len(area_list)>4 else area_full
+        
+        title = response.doc('.title').text().split(u"（")
 
         return {
             "id" : sid,
             "parent" : sid.rsplit("-",1)[0],
-            "name" : response.doc('.title').text().split(" ")[2] ,
-            "name_full": response.doc('.title').text(),
+            "name_full": title[0].replace(u"旅游攻略","") if title else "" ,
+            "name" : title[0].split(" ")[-1] if title[0] else "" ,
 
             "url": response.url,
             "detail" : response.doc('.spotinfo').text(),
@@ -155,6 +134,7 @@ class Handler(BaseHandler):
             "area": area_full.split('.')[-1] if area_full else "",
             "image" : 'https://i.meet99.cn'+js(response.doc('#curphoto > div').attr.l),
             "type" : "scenic_spot",
+            "sort" : response.doc('.title > span').text()
         }
     def on_result(self, result):
         super(Handler, self).on_result(result)
@@ -162,10 +142,9 @@ class Handler(BaseHandler):
             return
         result["update"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         client = pymongo.MongoClient('127.0.0.1')
-        db = client["scenics_anhui"]
+        db = client["scenics_hefei"]
         travel = db["meet"]
-        
-        
-        
+        travel.update({'id': result.get('id')}, {'$set': result},True,False)
+    
 
             
