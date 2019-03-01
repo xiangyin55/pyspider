@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-# Created on 2019-02-19 22:26:17
-# Project: jingdian_bytravel_anhui_v1
+# Created on 2019-02-28 11:02:36
+# Project: bytravel_anhui_v1
 
 from pyspider.libs.base_handler import *
 import json,re,random,datetime,pymongo
@@ -17,8 +17,9 @@ class Handler(BaseHandler):
 
     @every(minutes=24 * 60)
     def on_start(self):
-        #self.crawl('http://wap.bytravel.cn/', callback=self.index_page)
-        self.crawl('http://wap.bytravel.cn/view/index120_list.html', callback=self.list_page)
+        #self.crawl('http://wap.bytravel.cn/', callback=self.index_page)  #中国
+        #self.crawl('http://wap.bytravel.cn/view/index120_list.html', callback=self.list_page) #安徽
+        self.crawl('http://wap.bytravel.cn/view/index392_list.html', callback=self.list_page)
         
     @config(age=10 * 24 * 60 * 60)
     def index_page(self, response):
@@ -65,10 +66,10 @@ class Handler(BaseHandler):
         if not result: return
         result["update"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         client = pymongo.MongoClient('127.0.0.1')
-        db = client["scenics_anhui"]
+        db = client["scenics_hefei"]
         travel = db["bytravel"]
-        try:
-            travel.update({'id': result.get('id')}, {'$set': result},True,False)
-        except Exception as e:
-            print (e)
-            print ("Error")
+        travel.update({'id': result.get('id')}, {'$set': result},True,False)
+
+        
+        
+        
