@@ -3,6 +3,7 @@
  * version: 0.5.0
  * update: bug fix/ add openSelecter
  * date: 2017-04-28
+ * https://github.com/tower1229/HybridStart/tree/master/sdk  数据预存
  */
 
 define(function(require, exports, module) {
