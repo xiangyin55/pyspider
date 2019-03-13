@@ -1,3 +1,4 @@
+//给定坐标点，判断是否在某区域范围内 地理围栏算法
 function IsPtInPoly(ALon, ALat, APoints) {
 	var iSum = 0,iCount;
 	var dLon1, dLon2, dLat1, dLat2, dLon;
